@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌋 지구와 화산 탐험대 - 낱말 퍼즐 게임</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Trendy Korean fonts: Bagel Fat One (ultra-chubby, cute & trendy), Gmarket Sans (geometric & sophisticated), and Pretendard -->
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gmarket+Sans:wght@300;500;700&family=Pretendard:wght@400;600;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Neo-brutalist Y2K Pop Palette */
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --ink: #1e293b;
+      --ink-soft: #475569;
+      
+      --neon-yellow: #facc15;
+      --neon-blue: #3b82f6;
+      --neon-pink: #f43f5e;
+      --neon-green: #10b981;
+      --neon-purple: #8b5cf6;
+      
+      --shadow-color: #1e293b;
+      --cell-size: 50px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg);
+      /* Trendy grid paper pattern background */
+      background-image: 
+        linear-gradient(rgba(30, 41, 59, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding: 1rem;
+    }
+
+    /* Trendy Neo-brutalist Header Card */
+    header {
+      background-color: #ffffff;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto 1.5rem auto;
+      box-shadow: 6px 6px 0px var(--shadow-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-yellow), var(--neon-green));
+    }
+
+    .header-logo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .header-tag {
+      background-color: var(--neon-purple);
+      color: white;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      align-self: flex-start;
+      border: 1.5px solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+      letter-spacing: 0.5px;
+    }
+
+    header h1 {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 34px;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-top: 0.35rem;
+    }
+
+    .header-desc {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      font-family: 'Gmarket Sans', sans-serif;
+    }
+
+    /* HUD Stats with a sticker-like design */
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-sticker {
+      background-color: var(--neon-yellow);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      box-shadow: 4px 4px 0px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .status-label {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    .status-value {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 20px;
+      color: var(--ink);
+    }
+
+    /* Main Grid & Panel split */
+    .main-grid-container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 2.5rem;
+      flex: 1;
+      align-items: center;
+    }
+
+    /* Left panel: Crossword Grid */
+    .grid-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid-box {
+      background-color: #ffffff;
+      border: 4px solid var(--ink);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 8px 8px 0px var(--shadow-color);
+      position: relative;
+    }
+
+    .grid-box::after {
+      content: '🌋 LAND OF CHANGE';
+      position: absolute;
+      bottom: -14px;
+      right: 20px;
+      background-color: var(--neon-pink);
+      color: white;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .crossword-grid {
+      display: grid;
+      gap: 3px;
+      background-color: var(--ink);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .grid-cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      background-color: var(--ink); /* Solid Blocked cell in dark slate */
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    }
+
+    .grid-cell.active {
+      background-color: var(--card-bg); /* White cell */
+      cursor: pointer;
+    }
+
+    .grid-cell.active:hover {
+      background-color: #f1f5f9;
+      transform: scale(1.03);
+      z-index: 2;
+    }
+
+    .grid-cell.active-word {
+      /* Vibrant neon yellow tint for active word path */
+      background-color: #fef08a !important;
+    }
+
+    .grid-cell.selected-cell {
+      /* Strong Neon Blue outline for focused cell */
+      background-color: #93c5fd !important;
+      outline: 4px solid var(--neon-blue);
+      z-index: 5;
+    }
+
+    .grid-cell.solved {
+      /* Bright Satisfying Mint-Green for solved cells */
+      background-color: var(--neon-green) !important;
+      animation: cellSolvePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    }
+
+    .grid-cell.solved-letter {
+      color: white !important;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.25);
+    }
+
+    .cell-number {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      user-select: none;
+    }
+
+    .cell-letter {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--ink);
+      user-select: none;
+    }
+
+    /* Right Panel: Neo-brutalist Interactive Card Board */
+    .dashboard-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .mission-card {
+      background-color: #ffffff;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0px var(--shadow-color);
+      position: relative;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Sticker on the side of Card */
+    .card-badge-sticker {
+      position: absolute;
+      top: 12px;
+      right: -25px;
+      background-color: var(--neon-pink);
+      color: white;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 9px;
+      padding: 4px 28px;
+      transform: rotate(45deg);
+      border: 2px solid var(--ink);
+    }
+
+    /* Idle Card State */
+    .idle-view {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .idle-sticker {
+      font-size: 40px;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    .idle-view h2 {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 24px;
+      color: var(--ink);
+    }
+
+    .idle-view p {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+      max-width: 290px;
+    }
+
+    /* Active Solving State */
+    .solving-view {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .question-tag {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tag-bubble {
+      background-color: var(--neon-blue);
+      color: white;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .tag-length {
+      background-color: var(--neon-purple);
+      color: white;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .question-box {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink);
+      background-color: var(--bg);
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    /* Small speech bubble arrow */
+    .question-box::before {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 30px;
+      border-width: 10px 10px 0;
+      border-style: solid;
+      border-color: var(--ink) transparent;
+      display: block;
+      width: 0;
+    }
+    
+    .question-box::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 31px;
+      border-width: 9px 9px 0;
+      border-style: solid;
+      border-color: var(--bg) transparent;
+      display: block;
+      width: 0;
+    }
+
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 0.85rem;
+    }
+
+    .answer-input {
+      flex: 1;
+      background-color: var(--bg);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--ink);
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.05em;
+      transition: all 0.15s;
+    }
+
+    .answer-input:focus {
+      background-color: white;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Brutalist Tactile Pill Buttons */
+    .btn-brutal {
+      border: 2.5px solid var(--ink);
+      border-radius: 10px;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.1s;
+      position: relative;
+    }
+
+    .btn-primary-brutal {
+      background-color: var(--neon-pink);
+      color: white;
+      padding: 10px 24px;
+      font-size: 15px;
+      box-shadow: 4px 4px 0px var(--ink);
+    }
+
+    .btn-primary-brutal:hover {
+      background-color: #e11d48;
+    }
+
+    .btn-primary-brutal:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px var(--ink);
+    }
+
+    .btn-secondary-brutal {
+      background-color: #ffffff;
+      color: var(--ink);
+      padding: 10px 16px;
+      font-size: 13px;
+      box-shadow: 4px 4px 0px var(--ink);
+      flex: 1;
+    }
+
+    .btn-secondary-brutal:hover {
+      background-color: #f1f5f9;
+    }
+
+    .btn-secondary-brutal:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px var(--ink);
+    }
+
+    /* Solved Card State */
+    .solved-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+    }
+
+    .solved-badge {
+      background-color: var(--neon-green);
+      color: white;
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 18px;
+      padding: 6px 20px;
+      border-radius: 9999px;
+      border: 2.5px solid var(--ink);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .solved-desc {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    /* Auxiliary bottom buttons */
+    .aux-controls {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    /* Final Victory Modal */
+    .complete-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      border: 4px solid var(--ink);
+      border-radius: 24px;
+      padding: 4rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      box-shadow: 10px 10px 0px var(--ink);
+      animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-sticker-icon {
+      font-size: 60px;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    .modal-content h2 {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 34px;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Keyframes */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(5deg); }
+    }
+
+    @keyframes cellSolvePop {
+      0% { transform: scale(0.9) rotate(-5deg); }
+      50% { transform: scale(1.1) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Trendy Neo-brutalist Header -->
+  <header>
+    <div class="header-logo">
+      <span class="header-tag">지구과학 스페셜</span>
+      <h1>지구와 화산 탐험대! 🌋</h1>
+      <span class="header-desc">과학 4학년 1학기 3단원 '땅의 변화' 핵심 단어 격파</span>
+    </div>
+    
+    <div class="hud-stats">
+      <div class="status-sticker">
+        <span class="status-label">MISSION PROGRESS</span>
+        <span class="status-value" id="scoreLabel">0 / 10 CLEAR!</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Game Main Body -->
+  <div class="main-grid-container">
+    <!-- Left panel: The crossword grid board -->
+    <div class="grid-panel">
+      <div class="grid-box">
+        <div class="crossword-grid" id="crosswordGrid"></div>
+      </div>
+    </div>
+
+    <!-- Right panel: Mission Controller panel -->
+    <div class="dashboard-panel">
+      <div class="mission-card" id="infoCard">
+        <div class="card-badge-sticker">QUEST</div>
+        
+        <!-- Idle state -->
+        <div class="idle-view" id="idleView">
+          <span class="idle-sticker">👾</span>
+          <h2>퍼즐 칸을 선택해 줘!</h2>
+          <p>가로세로 낱말판에서 비어있는 흰색 칸을 마우스로 클릭하면, 해결해야 하는 미션 퀴즈 카드가 우측에 뜬단다!</p>
+        </div>
+
+        <!-- Question solving state -->
+        <div class="solving-view" id="activeView">
+          <div class="question-tag">
+            <span class="tag-bubble" id="questionDir">가로 1번</span>
+            <span class="tag-length" id="questionLength">4글자 단어</span>
+          </div>
+          
+          <div class="question-box" id="questionText">
+            물이 흘러가며 바위나 돌을 깎아 내는 작용.
+          </div>
+          
+          <div class="input-section">
+            <div class="input-wrapper">
+              <input type="text" class="answer-input" id="answerInput" placeholder="여기에 정답 입력!" autocomplete="off">
+              <button class="btn-brutal btn-primary-brutal" id="btnSubmit">확인! 🚀</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Solved feedback state -->
+        <div class="solved-view" id="solvedView">
+          <span class="solved-badge">CLEAR! 👍</span>
+          <p class="solved-desc" id="solvedFeedbackText">정답은 침식작용이었습니다!</p>
+        </div>
+      </div>
+
+      <!-- Controls row -->
+      <div class="aux-controls">
+        <button class="btn-brutal btn-secondary-brutal" id="btnHint">💡 한 글자 힌트 조르기</button>
+        <button class="btn-brutal btn-secondary-brutal" onclick="location.reload()">🔄 퍼즐 새로 짜기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Win modal -->
+  <div class="complete-modal" id="completeModal">
+    <div class="modal-content">
+      <span class="modal-sticker-icon">🏅</span>
+      <h2>축하해! 탐험 완수!</h2>
+      <p>지구를 위협하는 핵심 10가지 과학 용어 퍼즐을 모두 완벽하게 격파했어!<br>너는 진정한 최고의 지질학 탐험가 대원이야! 🌋🎉</p>
+      <button class="btn-brutal btn-primary-brutal" onclick="location.reload()" style="margin: 0 auto; padding: 12px 32px;">🔄 다시 도전하기</button>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    // Audio synthesizer retro sounds
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'success') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+          g.gain.setValueAtTime(0.08, audioCtx.currentTime + idx * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.3);
+          o.start(audioCtx.currentTime + idx * 0.08);
+          o.stop(audioCtx.currentTime + idx * 0.08 + 0.3);
+        });
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.22);
+      } else if (type === 'fanfare') {
+        const fanfareNotes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+        fanfareNotes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.09);
+          g.gain.setValueAtTime(0.1, audioCtx.currentTime + idx * 0.09);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.09 + 0.5);
+          o.start(audioCtx.currentTime + idx * 0.09);
+          o.stop(audioCtx.currentTime + idx * 0.09 + 0.5);
+        });
+      }
+    }
+
+    const database = [
+      { "question": "물이 흘러가며 바위나 돌을 깎아 내는 흐르는 물의 작용을 ( 67쪽 )이라고 합니다.", "answer": "침식작용" },
+      { "question": "깎여 나간 돌이나 흙을 다른 곳으로 이동시키는 흐르는 물의 작용을 ( 67쪽 )이라고 합니다.", "answer": "운반작용" },
+      { "question": "운반된 돌이나 흙이 흘러가다 쌓이는 흐르는 물의 작용을 ( 67쪽 )이라고 합니다.", "answer": "퇴적작용" },
+      { "question": "땅속의 마그마가 지표면의 약한 부분을 뚫고 나오는 화산 활동으로 만들어진 지형을 ( 72쪽 )이라고 합니다.", "answer": "화산" },
+      { "question": "땅속 깊은 곳에서 암석이 높은 열에 의해 녹은 물질을 ( 72쪽 )라고 합니다.", "answer": "마그마" },
+      { "question": "화산 활동으로 분출된 물질 중 고온의 액체 상태로 흘러내리는 물질을 ( 73쪽 )이라고 합니다.", "answer": "용암" },
+      { "question": "마그마가 식어서 굳어 만들어진 암석을 통틀어 ( 76쪽 )이라고 합니다.", "answer": "화성암" },
+      { "question": "마그마가 땅속 깊은 곳에서 아주 서서히 식어 구성 알갱이가 크게 만들어진 밝은색 화성암을 ( 77쪽 )이라고 합니다.", "answer": "화강암" },
+      { "question": "마그마가 지표면 가까이에서 빠르게 식어 알갱이가 작고 어두운 색을 띠는 화성암을 ( 77쪽 )이라고 합니다.", "answer": "현무암" },
+      { "question": "지구 내부의 힘에 의해 땅이 갑자기 흔들리며 갈라지고 무너지는 현상을 ( 80쪽 )이라고 합니다.", "answer": "지진" }
+    ];
+
+    const size = 10;
+    let grid = Array(size).fill(null).map(() => Array(size).fill(''));
+    let placedWords = [];
+    let solvedWords = new Set();
+    let activeWordIndex = -1;
+
+    function buildLayout() {
+      let words = database.map((d, index) => ({
+        text: d.answer,
+        clue: d.question,
+        originalIndex: index
+      }));
+
+      words.sort((a, b) => b.text.length - a.text.length);
+
+      let bestGrid = null;
+      let bestPlaced = [];
+      let maxCount = -1;
+
+      for (let iter = 0; iter < 100; iter++) {
+        let queue = [...words];
+        if (iter > 0) {
+          for (let i = 1; i < queue.length; i++) {
+            let j = i + Math.floor(Math.random() * (queue.length - i));
+            let temp = queue[i];
+            queue[i] = queue[j];
+            queue[j] = temp;
+          }
+        }
+
+        let currentGrid = Array(size).fill(null).map(() => Array(size).fill(''));
+        let currentPlaced = [];
+
+        let first = queue[0];
+        let startX = Math.floor((size - first.text.length) / 2);
+        let startY = Math.floor(size / 2);
+        for (let i = 0; i < first.text.length; i++) {
+          currentGrid[startY][startX + i] = first.text[i];
+        }
+        currentPlaced.push({
+          text: first.text,
+          clue: first.clue,
+          x: startX,
+          y: startY,
+          direction: 'across',
+          originalIndex: first.originalIndex
+        });
+
+        for (let w = 1; w < queue.length; w++) {
+          let word = queue[w];
+          let bestPlacement = null;
+          let bestScore = -1;
+
+          for (let i = 0; i < word.text.length; i++) {
+            let letter = word.text[i];
+
+            for (let y = 0; y < size; y++) {
+              for (let x = 0; x < size; x++) {
+                if (currentGrid[y][x] === letter) {
+                  let p1 = checkPlacement(currentGrid, word.text, x, y - i, 'down');
+                  if (p1 && p1.score > bestScore) {
+                    bestScore = p1.score;
+                    bestPlacement = p1;
+                  }
+                  let p2 = checkPlacement(currentGrid, word.text, x - i, y, 'across');
+                  if (p2 && p2.score > bestScore) {
+                    bestScore = p2.score;
+                    bestPlacement = p2;
+                  }
+                }
+              }
+            }
+          }
+
+          if (bestPlacement) {
+            currentPlaced.push({
+              text: word.text,
+              clue: word.clue,
+              x: bestPlacement.x,
+              y: bestPlacement.y,
+              direction: bestPlacement.direction,
+              originalIndex: word.originalIndex
+            });
+
+            for (let i = 0; i < word.text.length; i++) {
+              if (bestPlacement.direction === 'across') {
+                currentGrid[bestPlacement.y][bestPlacement.x + i] = word.text[i];
+              } else {
+                currentGrid[bestPlacement.y + i][bestPlacement.x] = word.text[i];
+              }
+            }
+          } else {
+            let pDisjoint = findDisjointPlacement(currentGrid, word.text);
+            if (pDisjoint) {
+              currentPlaced.push({
+                text: word.text,
+                clue: word.clue,
+                x: pDisjoint.x,
+                y: pDisjoint.y,
+                direction: pDisjoint.direction,
+                originalIndex: word.originalIndex
+              });
+
+              for (let i = 0; i < word.text.length; i++) {
+                if (pDisjoint.direction === 'across') {
+                  currentGrid[pDisjoint.y][pDisjoint.x + i] = word.text[i];
+                } else {
+                  currentGrid[pDisjoint.y + i][pDisjoint.x] = word.text[i];
+                }
+              }
+            }
+          }
+        }
+
+        if (currentPlaced.length > maxCount) {
+          maxCount = currentPlaced.length;
+          bestGrid = currentGrid;
+          bestPlaced = currentPlaced;
+        }
+
+        if (maxCount === 10) break;
+      }
+
+      grid = bestGrid;
+      placedWords = bestPlaced;
+    }
+
+    function checkPlacement(gridState, word, startX, startY, dir) {
+      let len = word.length;
+      if (startX < 0 || startY < 0) return null;
+      if (dir === 'across' && startX + len > size) return null;
+      if (dir === 'down' && startY + len > size) return null;
+
+      let intersections = 0;
+      let score = 0;
+
+      for (let i = 0; i < len; i++) {
+        let x = startX + (dir === 'across' ? i : 0);
+        let y = startY + (dir === 'across' ? 0 : i);
+        let curr = gridState[y][x];
+
+        if (curr !== '' && curr !== word[i]) return null;
+        if (curr === word[i]) {
+          intersections++;
+        } else {
+          if (dir === 'across') {
+            if (y > 0 && gridState[y - 1][x] !== '') return null;
+            if (y < size - 1 && gridState[y + 1][x] !== '') return null;
+          } else {
+            if (x > 0 && gridState[y][x - 1] !== '') return null;
+            if (x < size - 1 && gridState[y][x + 1] !== '') return null;
+          }
+        }
+      }
+
+      if (dir === 'across') {
+        if (startX > 0 && gridState[startY][startX - 1] !== '') return null;
+        if (startX + len < size && gridState[startY][startX + len] !== '') return null;
+      } else {
+        if (startY > 0 && gridState[startY - 1][startX] !== '') return null;
+        if (startY + len < size && gridState[startY + len][startX] !== '') return null;
+      }
+
+      if (intersections === 0) return null; 
+
+      score = intersections * 10;
+      return { x: startX, y: startY, direction: dir, score: score };
+    }
+
+    function findDisjointPlacement(gridState, word) {
+      let len = word.length;
+      let directions = ['across', 'down'];
+      
+      for (let attempt = 0; attempt < 30; attempt++) {
+        let dir = directions[Math.floor(Math.random() * 2)];
+        let startX = Math.floor(Math.random() * (size - (dir === 'across' ? len : 0)));
+        let startY = Math.floor(Math.random() * (size - (dir === 'down' ? len : 0)));
+
+        let isValid = true;
+        for (let i = 0; i < len; i++) {
+          let x = startX + (dir === 'across' ? i : 0);
+          let y = startY + (dir === 'across' ? 0 : i);
+
+          if (gridState[y][x] !== '') {
+            isValid = false;
+            break;
+          }
+
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              let ny = y + dy;
+              let nx = x + dx;
+              if (ny >= 0 && ny < size && nx >= 0 && nx < size) {
+                if (gridState[ny][nx] !== '') {
+                  isValid = false;
+                  break;
+                }
+              }
+            }
+            if (!isValid) break;
+          }
+          if (!isValid) break;
+        }
+
+        if (isValid) {
+          return { x: startX, y: startY, direction: dir };
+        }
+      }
+      return null;
+    }
+
+    function renderBoard() {
+      const gridEl = document.getElementById('crosswordGrid');
+      gridEl.innerHTML = '';
+      gridEl.style.gridTemplateColumns = `repeat(${size}, var(--cell-size))`;
+
+      let startCoordinates = {};
+      placedWords.forEach((w, idx) => {
+        let key = `${w.x},${w.y}`;
+        if (!startCoordinates[key]) startCoordinates[key] = [];
+        startCoordinates[key].push({ wordIndex: idx, dir: w.direction });
+      });
+
+      let numberCounter = 1;
+      let cellNumbers = Array(size).fill(null).map(() => Array(size).fill(0));
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          let key = `${x},${y}`;
+          if (startCoordinates[key]) {
+            cellNumbers[y][x] = numberCounter;
+            startCoordinates[key].forEach(sc => {
+              placedWords[sc.wordIndex].number = numberCounter;
+            });
+            numberCounter++;
+          }
+        }
+      }
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          let cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+
+          let letter = grid[y][x];
+          if (letter) {
+            cell.classList.add('active');
+            cell.dataset.letter = letter;
+
+            let num = cellNumbers[y][x];
+            if (num > 0) {
+              let numSpan = document.createElement('span');
+              numSpan.className = 'cell-number';
+              numSpan.innerText = num;
+              cell.appendChild(numSpan);
+            }
+
+            let letterSpan = document.createElement('span');
+            letterSpan.className = 'cell-letter';
+            letterSpan.innerText = ''; 
+            cell.appendChild(letterSpan);
+
+            cell.addEventListener('click', () => {
+              playSound('click');
+              handleCellClick(x, y);
+            });
+          }
+
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function handleCellClick(x, y) {
+      let overlappingWords = [];
+      placedWords.forEach((w, idx) => {
+        let len = w.text.length;
+        if (w.direction === 'across') {
+          if (y === w.y && x >= w.x && x < w.x + len) {
+            overlappingWords.push(idx);
+          }
+        } else {
+          if (x === w.x && y >= w.y && y < w.y + len) {
+            overlappingWords.push(idx);
+          }
+        }
+      });
+
+      if (overlappingWords.length === 0) return;
+
+      let selectedIdx = overlappingWords[0];
+      if (overlappingWords.length > 1 && overlappingWords.includes(activeWordIndex)) {
+        let currIndex = overlappingWords.indexOf(activeWordIndex);
+        selectedIdx = overlappingWords[(currIndex + 1) % overlappingWords.length];
+      }
+
+      selectWord(selectedIdx);
+    }
+
+    function selectWord(idx) {
+      activeWordIndex = idx;
+      let word = placedWords[idx];
+
+      document.querySelectorAll('.grid-cell').forEach(c => {
+        c.classList.remove('active-word', 'selected-cell');
+      });
+
+      let len = word.text.length;
+      for (let i = 0; i < len; i++) {
+        let cellX = word.x + (word.direction === 'across' ? i : 0);
+        let cellY = word.y + (word.direction === 'across' ? 0 : i);
+        let cellEl = document.querySelector(`.grid-cell[data-x="${cellX}"][data-y="${cellY}"]`);
+        if (cellEl) {
+          cellEl.classList.add('active-word');
+          if (i === 0) cellEl.classList.add('selected-cell');
+        }
+      }
+
+      document.getElementById('idleView').style.display = 'none';
+      
+      if (solvedWords.has(idx)) {
+        document.getElementById('activeView').style.display = 'none';
+        document.getElementById('solvedView').style.display = 'flex';
+        document.getElementById('solvedFeedbackText').innerText = `이미 격파 완료한 낱말이야! 정답: "${word.text}"`;
+      } else {
+        document.getElementById('solvedView').style.display = 'none';
+        document.getElementById('activeView').style.display = 'flex';
+        
+        let dirKorean = word.direction === 'across' ? '가로' : '세로';
+        document.getElementById('questionDir').innerText = `${dirKorean} ${word.number}번 퀴즈`;
+        document.getElementById('questionLength').innerText = `${len}글자 단어`;
+
+        let pageMatch = word.clue.match(/\(\s*(\d+쪽)\s*\)/);
+        let pageText = pageMatch ? pageMatch[0] : '';
+        let cleanedClueText = word.clue.replace(/\(\s*\d+쪽\s*\)/, `[        ]`);
+        
+        document.getElementById('questionText').innerHTML = `${cleanedClueText} <span style="color: var(--neon-blue); font-weight: 800; margin-left: 4px;">${pageText}</span>`;
+
+        let input = document.getElementById('answerInput');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    function submitAnswer() {
+      if (activeWordIndex === -1) return;
+      let word = placedWords[activeWordIndex];
+      let inputVal = document.getElementById('answerInput').value.trim().replace(/\s+/g, '');
+
+      if (inputVal === word.text) {
+        playSound('success');
+        triggerConfettiBoom();
+        solvedWords.add(activeWordIndex);
+
+        let len = word.text.length;
+        for (let i = 0; i < len; i++) {
+          let cellX = word.x + (word.direction === 'across' ? i : 0);
+          let cellY = word.y + (word.direction === 'across' ? 0 : i);
+          let cellEl = document.querySelector(`.grid-cell[data-x="${cellX}"][data-y="${cellY}"]`);
+          if (cellEl) {
+            cellEl.classList.add('solved');
+            let letterSpan = cellEl.querySelector('.cell-letter');
+            if (letterSpan) {
+              letterSpan.innerText = word.text[i];
+              letterSpan.classList.add('solved-letter');
+            }
+          }
+        }
+
+        document.getElementById('activeView').style.display = 'none';
+        document.getElementById('solvedView').style.display = 'flex';
+        document.getElementById('solvedFeedbackText').innerText = `정답 [ ${word.text} ] 격파 성공! 대단해! 👍`;
+
+        updateProgress();
+      } else {
+        playSound('error');
+        const inputEl = document.getElementById('answerInput');
+        inputEl.style.borderColor = 'var(--neon-pink)';
+        inputEl.style.backgroundColor = 'rgba(244, 63, 94, 0.08)';
+        setTimeout(() => {
+          inputEl.style.borderColor = '';
+          inputEl.style.backgroundColor = '';
+        }, 800);
+      }
+    }
+
+    function revealHint() {
+      if (activeWordIndex === -1) return;
+      let word = placedWords[activeWordIndex];
+      let len = word.text.length;
+
+      let unrevealedCells = [];
+      for (let i = 0; i < len; i++) {
+        let cellX = word.x + (word.direction === 'across' ? i : 0);
+        let cellY = word.y + (word.direction === 'across' ? 0 : i);
+        let cellEl = document.querySelector(`.grid-cell[data-x="${cellX}"][data-y="${cellY}"]`);
+        if (cellEl) {
+          let letterSpan = cellEl.querySelector('.cell-letter');
+          if (letterSpan && letterSpan.innerText === '') {
+            unrevealedCells.push({ letter: word.text[i], span: letterSpan, cell: cellEl });
+          }
+        }
+      }
+
+      if (unrevealedCells.length > 0) {
+        playSound('click');
+        let randomChoice = unrevealedCells[Math.floor(Math.random() * unrevealedCells.length)];
+        randomChoice.span.innerText = randomChoice.letter;
+        randomChoice.span.style.color = 'var(--neon-purple)';
+        randomChoice.span.style.fontWeight = '900';
+        
+        randomChoice.cell.style.backgroundColor = 'rgba(139, 92, 246, 0.15)';
+        setTimeout(() => {
+          randomChoice.cell.style.backgroundColor = '';
+        }, 600);
+      }
+    }
+
+    function updateProgress() {
+      const solvedCount = solvedWords.size;
+      document.getElementById('scoreLabel').innerText = `${solvedCount} / 10 CLEAR!`;
+
+      if (solvedCount === 10) {
+        setTimeout(() => {
+          playSound('fanfare');
+          triggerVictoryBlast();
+          document.getElementById('completeModal').style.display = 'flex';
+        }, 1200);
+      }
+    }
+
+    // Neon Confetti Particle System
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 8 + 4;
+        this.speedX = Math.random() * 10 - 5;
+        this.speedY = Math.random() * -14 - 4;
+        this.color = color;
+        this.gravity = 0.45;
+        this.decay = Math.random() * 0.015 + 0.008;
+        this.alpha = 1;
+      }
+      update() {
+        this.speedY += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function triggerConfettiBoom() {
+      const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#8b5cf6'];
+      const x = window.innerWidth * 0.75; 
+      const y = window.innerHeight * 0.6;
+      for (let i = 0; i < 45; i++) {
+        let c = colors[Math.floor(Math.random() * colors.length)];
+        particles.push(new Particle(x, y, c));
+      }
+    }
+
+    function triggerVictoryBlast() {
+      const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#8b5cf6'];
+      for (let blast = 0; blast < 5; blast++) {
+        setTimeout(() => {
+          let x = Math.random() * window.innerWidth;
+          let y = window.innerHeight * 0.8;
+          for (let i = 0; i < 65; i++) {
+            let c = colors[Math.floor(Math.random() * colors.length)];
+            particles.push(new Particle(x, y, c));
+          }
+        }, blast * 280);
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    document.getElementById('btnSubmit').addEventListener('click', submitAnswer);
+    document.getElementById('btnHint').addEventListener('click', revealHint);
+    document.getElementById('answerInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        submitAnswer();
+      }
+    });
+
+    buildLayout();
+    renderBoard();
+
+  </script>
+</body>
+</html>
